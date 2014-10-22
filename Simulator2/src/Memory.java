@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author knispeja
  *		   Created 10/21/2014
  */
-public class Memory extends Object{
+public class Memory extends Object implements Clockable{
 	
 	private final int blockSize = 1;
 	
