@@ -1,11 +1,11 @@
 
 /**
- * TODO Put here a description of what this class does.
+ * This class is super classy! Wow it is great. I can't believe how classy this class is.
  *
  * @author larsonp.
  *         Created Oct 21, 2014.
  */
-public class Classy {
+public class MainSim {
 
 	/**
 	 * TODO Put here a description of what this method does.
