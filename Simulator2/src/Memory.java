@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author knispeja
  *		   Created 10/21/2014
  */
-public class Memory extends Object implements Clockable{
+public class Memory implements Clockable{
 	
 	private final int blockSize = 1;
 	
@@ -18,8 +18,7 @@ public class Memory extends Object implements Clockable{
 	private int writeAddr;
 	private int din;
 	private String readval;
-	
-	private boolean memwrite;
+	private String memwrite;
 	
 	/**
 	 * Constructor initializes memory at default values
@@ -38,7 +37,7 @@ public class Memory extends Object implements Clockable{
 		Arrays.fill(this.memArray, -17);
 		this.minAddr = min;
 		this.maxAddr = max;
-		this.memwrite = false;
+		this.memwrite = "0";
 	}
 	
 	public void clockCycle(){
@@ -47,7 +46,7 @@ public class Memory extends Object implements Clockable{
 		else
 			System.err.println("Memory: Something passed an invalid address into readAddr");
 		
-		if(this.memwrite){
+		if(Converter.booleanString2Dec(this.memwrite) != 0){
 			if(this.writeAddr >= this.minAddr && this.readAddr <= this.maxAddr)
 				this.memArray[this.writeAddr/this.blockSize] = this.din;
 			else
@@ -66,6 +65,10 @@ public class Memory extends Object implements Clockable{
 	
 	public void writeAddr(String addr16bit){
 		this.writeAddr = Converter.booleanString2Dec(addr16bit);
+	}
+	
+	public void memwrite(String memwrite){
+		this.memwrite = memwrite;
 	}
 	
 	public String read(){
