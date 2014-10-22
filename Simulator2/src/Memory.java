@@ -8,6 +8,8 @@ import java.util.Arrays;
  */
 public class Memory extends Object{
 	
+	private final int blockSize = 1;
+	
 	private int[] memArray;
 	private int minAddr;
 	private int maxAddr;
@@ -41,13 +43,13 @@ public class Memory extends Object{
 	
 	public void clockCycle(){
 		if(this.readAddr >= this.minAddr && this.readAddr <= this.maxAddr)
-			this.readval = Converter.intToBooleanString(this.memArray[this.readAddr]);
+			this.readval = Converter.intToBooleanString(this.memArray[this.readAddr/this.blockSize]);
 		else
 			System.err.println("Memory: Something passed an invalid address into readAddr");
 		
 		if(this.memwrite){
 			if(this.writeAddr >= this.minAddr && this.readAddr <= this.maxAddr)
-				this.memArray[this.writeAddr] = this.din;
+				this.memArray[this.writeAddr/this.blockSize] = this.din;
 			else
 				System.err.println("Memory: Something passed an invalid address into writeAddr");
 		}
