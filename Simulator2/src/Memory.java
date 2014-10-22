@@ -52,26 +52,25 @@ public class Memory implements Clockable{
 			else
 				System.err.println("Memory: Something passed an invalid address into writeAddr");
 		}
-			
 	}
 	
-	public void din(String data16bit){
+	public void setdin(String data16bit){
 		this.din = Converter.booleanString2Dec(data16bit);
 	}
 	
-	public void readAddr(String addr16bit){
+	public void setreadAddr(String addr16bit){
 		this.readAddr = Converter.booleanString2Dec(addr16bit);
 	}
 	
-	public void writeAddr(String addr16bit){
+	public void setwriteAddr(String addr16bit){
 		this.writeAddr = Converter.booleanString2Dec(addr16bit);
 	}
 	
-	public void memwrite(String memwrite){
+	public void setmemwrite(String memwrite){
 		this.memwrite = memwrite;
 	}
 	
-	public String read(){
+	public String getread(){
 		return this.readval;
 	}
 	
