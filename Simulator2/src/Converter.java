@@ -32,4 +32,23 @@ public class Converter {
 		}
 		return zeroes+temp;
 	}
+	
+	/**
+	 * Same as convert, but allows you to specify the length of the binary string it returns
+	 *
+	 * @param input
+	 * @param length
+	 * @return
+	 */
+	public static String intToBooleanString_withLength(int input, int length){
+		String zeroes = "";
+		String temp = Integer.toBinaryString(input);
+		if (temp.length() < length) {
+			int needed = length - temp.length();
+			for (int j = 0; j < needed; j++) {
+				zeroes=zeroes+"0";
+			}
+		}
+		return zeroes+temp;
+	}
 }
