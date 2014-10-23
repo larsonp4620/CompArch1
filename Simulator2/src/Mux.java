@@ -1,4 +1,9 @@
-
+/**
+ * Represents any number of inputs connecting to any number of destinations,
+ * the input to be distributed is determined by a control input.
+ * @author knispeja
+ *
+ */
 public class Mux implements Clockable {
 
 	private int control;
@@ -45,6 +50,11 @@ public class Mux implements Clockable {
 		}
 	}
 	
+	/**
+	 * Should be used for testing purposes only
+	 * @param control
+	 * @return
+	 */
 	public String getData(String control){
 		return this.data[Converter.booleanString2Dec(control)];
 	}

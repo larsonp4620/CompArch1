@@ -1,4 +1,4 @@
-public class Register implements Clockable{
+public class Register implements Clockable, Readable, Writable{
 
 	private String input;
 	private String output;
@@ -15,17 +15,30 @@ public class Register implements Clockable{
 		if(Converter.booleanString2Dec(this.regwrite) != 0)
 			this.output = this.input;
 	}
-	
-	public void setInput(String input){
-		this.input = input;
-	}
-	
-	public String getOutput(){
+
+	/**
+	 * id is ignored -- there is only 1 value to read.
+	 */
+	@Override
+	public String read(int id) {
 		return this.output;
 	}
-	
-	public void regwrite(String regwrite){
-		this.regwrite = regwrite;
+
+	/**
+	 * Use of id:
+	 * 0: input/src value
+	 * 1: regwrite value
+	 */
+	@Override
+	public void write(int id, String data) {
+		switch(id){
+			case 0: this.input = data;
+					break;
+			case 1: this.regwrite = data;
+					break;
+			default: System.err.println("Reg: Invalid write id passed in.");
+					break;
+		}
 	}
 	
 }

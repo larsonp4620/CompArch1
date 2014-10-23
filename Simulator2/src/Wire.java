@@ -1,4 +1,7 @@
-
+/**
+ * Represents a wire connecting one source to any number of destinations
+ * @author knispeja
+ */
 public class Wire implements Clockable{
 
 	private Readable input;
