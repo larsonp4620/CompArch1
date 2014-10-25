@@ -23,13 +23,13 @@ public class RegFile implements Clockable, Readable, Writable {
 		this.randElement = new Random();
 
 		registerList = new int[8];
-		int dout1 = -13;
-		int dout2 = -13;
-		int raddr1 = -13;
-		int raddr2 = -13;
-		int waddr = -13;
-		int din = -13;
-		int regWrite = -13;
+		this.dout1 = -13;
+		this.dout2 = -13;
+		this.raddr1 = -13;
+		this.raddr2 = -13;
+		this.waddr = -13;
+		this.din = -13;
+		this.regWrite = -13;
 
 		this.registerList[0] = 0;
 		for (int i = 1; i < 8; i++) {
