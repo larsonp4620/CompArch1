@@ -15,9 +15,11 @@ public class MainSim {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub.
 		System.out.println("----Testing Conversions----");
-		System.out.println(Converter.booleanString2Dec("00001"));
-		System.out.println(Converter.intToBooleanString_withLength(10,5));
+		System.out.println("00001-> "+Converter.booleanString2Dec("00001"));
+		System.out.println("10,5-> "+Converter.intToBooleanString_withLength(10,5));
 		System.out.println();
+		
+		System.out.println("----");
 		
 		
 	}

@@ -1,0 +1,16 @@
+sadd 00000 x
+ssub 00001 x
+sor 00010 x
+sand 00011 x
+sslt 00100 x
+push 00101 i
+pop 00110 i
+dup 00111 i
+jal 01000 i
+sbeq 01001 i
+sbne 01010 i
+j 01011 i
+sra 01100 i
+sll 01101 i
+ret 01110 x
+pushu 01111 i
