@@ -1,0 +1,4 @@
+pop 2
+pop
+push
+wait: pop
