@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+/**
+ * This class is an Assembler. Use it for Assembling things. Comes with no instructions, (But many helpful methods)
+ *
+ * @author larsonp.
+ *         Created Oct 26, 2014.
+ */
 public class Assembler {
 	boolean bytecodesuccess;
 	Scanner scan = null;
@@ -143,34 +149,62 @@ public class Assembler {
 			}
 
 			this.scan.close();
+			
 			String[] argArray=argList.toArray(new String[2]);
 			String[] formatArray=this.byteMap.get(argArray[0]);
 
-				this.byteCodeArray[index]=formatArray[0];
-				
-			for(int subIndex=1;subIndex<argArray.length;subIndex++){
-				
-				String argI=argArray[subIndex];
-				String formatI=formatArray[subIndex];
-				
-				if(formatI.equals("x"))
-					this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(0,11);
-				
-				else if(formatI.equals("i")&&subIndex==1){
-					try{
-					this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(Integer.parseInt(argI),11);
-					} catch (Exception e){
-						this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(0,11);
-					}
-				}
-			
-				// Add more types here-----------------------------------------------------------------------------------
-			}
+			this.byteCodeArray[index]=getByteCodeLine(formatArray,argArray);
 			
 			
 			
 		}
 
+	}
+
+	private String getByteCodeLine(String[] formatArray,String[] argumentArray){
+		try{
+		String lineOfByteCode=formatArray[0];
+		
+		for(int subIndex=1;subIndex<argumentArray.length;subIndex++){
+			String argI=argumentArray[subIndex];
+			String formatI=formatArray[subIndex];
+
+			
+			
+			if(formatI.equals("x"))
+				lineOfByteCode+=AssemblerConverter.intToBooleanString_withLength(0,11);
+
+			else if(formatI.equals("i")&&(argumentArray[0].equals("sbne")||argumentArray[0].equals("sbeq"))){
+				Flag f=null;
+				for(int i=0;i<this.flagList.size();i++)
+					if(this.flagList.get(i).name.equals(argI))
+						f=this.flagList.get(i);
+				if(f==null){
+					System.err.println("Error compiling. Check flags used for branches");
+					return "-17-17-17-17-17-17-17-17-17";
+				}
+				int address=f.address;
+				int extra=(int) (Math.log((double)this.instructionInterval)/Math.log(2.0));
+				String binaryaddress=AssemblerConverter.intToBooleanString_withLength(0,extra);
+				binaryaddress+=AssemblerConverter.intToBooleanString_withLength(address,11);
+				binaryaddress=binaryaddress.substring(0,binaryaddress.length()-extra);
+				lineOfByteCode+=binaryaddress;
+				
+			}	else if(formatI.equals("i")&&subIndex==1){
+				try{
+					lineOfByteCode+=AssemblerConverter.intToBooleanString_withLength(Integer.parseInt(argI),11);
+				} catch (Exception e){
+					lineOfByteCode+=AssemblerConverter.intToBooleanString_withLength(0,11);
+				}
+			}
+		
+			// Add more types here-----------------------------------------------------------------------------------
+		}
+		return lineOfByteCode;
+		} catch (Exception e){
+			System.err.println("Error compiling. Check flags used for branches");
+			return("this line error'd");
+		}
 	}
 
 	private void writeToFile(String destination){
