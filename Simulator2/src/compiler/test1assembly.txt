@@ -1,4 +1,7 @@
 pop 2
 pop
-push
+push 4
 wait: pop
+dup 2
+push 4
+j wait

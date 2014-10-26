@@ -9,13 +9,20 @@ public class Assembler {
 	boolean bytecodesuccess;
 	Scanner scan = null;
 	HashMap<String, String[]> byteMap = new HashMap<String, String[]>();
-	String[] assemblyInput;
-	String[] flags;
+	ArrayList<String> assemblyInput;
+	ArrayList<Flag> flagList = new ArrayList<Flag>();
 	int instructionInterval;
+	int baseAddress;
+	String[] byteCodeArray;
 
-	public Assembler(String BytecodeS0urce, int instructionInterval) {
-		this.instructionInterval=instructionInterval;
+	/*
+	 * takes byteSource, Instruction Interval, and Base Address.
+	 */
+	public Assembler(String BytecodeS0urce, int instructionInterval,
+			int baseAddress) {
+		this.instructionInterval = instructionInterval;
 		this.loadByteDefinitions(BytecodeS0urce);
+		this.baseAddress = baseAddress;
 	}
 
 	private void loadByteDefinitions(String source) {
@@ -24,11 +31,14 @@ public class Assembler {
 			File byteFile = new File(source);
 			this.scan = new Scanner(byteFile);
 			while (this.scan.hasNext()) {
-				String token1 = scan.next();
-				String token2 = scan.next();
-				String token3 = scan.next();
-				String[] token23 = { token2, token3 };
-				this.byteMap.put(token1, token23);
+				String line = scan.nextLine();
+				Scanner lineScanner = new Scanner(line);
+				ArrayList<String> tokens = new ArrayList<String>();
+				while (lineScanner.hasNext())
+					tokens.add(lineScanner.next());
+				lineScanner.close();
+				this.byteMap.put(tokens.remove(0),
+						tokens.toArray(new String[3]));
 			}
 			this.bytecodesuccess = true;
 		} catch (Exception e) {
@@ -54,43 +64,97 @@ public class Assembler {
 		try {
 			File assemblyFile = new File(source);
 			this.scan = new Scanner(assemblyFile);
-			//this.scan.useDelimiter("\\s\n\\s|\\s:\\s");
-			String line="";
+			// this.scan.useDelimiter("\\s\n\\s|\\s:\\s");
+			String line = "";
 			Scanner lineScanner;
-			
-			while (this.scan.hasNext()){
-				line=this.scan.nextLine();
-				if(line.contains(":")){
-					lineScanner=new Scanner(line);
+
+			while (this.scan.hasNext()) {
+				line = this.scan.nextLine();
+				if (line.contains(":")) {
+					lineScanner = new Scanner(line);
 					rawAssembly.add(lineScanner.next());
-					if(lineScanner.hasNext())
-					rawAssembly.add(lineScanner.next());
-					if(lineScanner.hasNext())
-					rawAssembly.add(lineScanner.next());
+					String rest = "";
+					while (lineScanner.hasNext())
+						rest = rest + lineScanner.next();
+					rawAssembly.add(rest);
 					lineScanner.close();
-				} else if(line.length()!=0){
+				} else if (line.length() != 0) {
 					rawAssembly.add(line);
 				}
 			}
-					
-			this.assemblyInput=rawAssembly.toArray(new String[2]);
+
+			this.assemblyInput = rawAssembly;
 		} catch (Exception e) {
 			System.err
 					.println("Did not load assembly code correctly.\nThere could be a syntax error");
 		}
 	}
 
-	private void extractFlags(){
-		String temp;
-		for(int i=0;i<assemblyInput.length;i++){
-			temp=assemblyInput[i];
-			if(temp.contains(":")){
-				int position=temp.indexOf(":");
+	public void extractCalculateFlags() {
+		String token;
+		int size = assemblyInput.size();
+		for (int i = 0; i < size; i++) {
+			token = assemblyInput.get(i);
+			if (token.contains(":")) {
+				int position = token.indexOf(":");
+				String name = token.substring(0, position);
+				Flag f = new Flag(i, name);
+				f.address = this.baseAddress + f.line
+						* this.instructionInterval;
+				flagList.add(f);
+				assemblyInput.remove(i);
+				i--;
+				size--;
 			}
 		}
 	}
+
 	public void run(String source, String destination) {
 		this.loadAssembly(source);
+		this.extractCalculateFlags();
+
 	}
 
+	public void run(String source) {
+		this.loadAssembly(source);
+		this.extractCalculateFlags();
+
+	}
+
+	private void generateByteCode() {
+		int arraySize = this.assemblyInput.size();
+		for (int index = 0; index < arraySize; index++) {
+			String assembleCode = this.assemblyInput.get(index);
+			this.scan = new Scanner(assembleCode);
+			ArrayList<String> argList = new ArrayList<String>();
+
+			for (int argNumber = 1; this.scan.hasNext(); argNumber++) { // puts
+																		// all
+																		// of
+																		// the
+																		// words
+																		// into
+																		// an
+																		// ArrayList
+				argList.add(this.scan.next());
+			}
+
+			this.scan.close();
+		}
+
+	}
+
+	private class Flag {
+		int line;
+		@SuppressWarnings("unused")
+		String name;
+		@SuppressWarnings("unused")
+		int address = -1;
+
+		private Flag(int line, String name) {
+			this.line = line;
+			this.name = name;
+		}
+
+	}
 }
