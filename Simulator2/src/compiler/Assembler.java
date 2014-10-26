@@ -1,6 +1,9 @@
 package compiler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -38,7 +41,7 @@ public class Assembler {
 					tokens.add(lineScanner.next());
 				lineScanner.close();
 				this.byteMap.put(tokens.remove(0),
-						tokens.toArray(new String[3]));
+						tokens.toArray(new String[2]));
 			}
 			this.bytecodesuccess = true;
 		} catch (Exception e) {
@@ -112,38 +115,78 @@ public class Assembler {
 	public void run(String source, String destination) {
 		this.loadAssembly(source);
 		this.extractCalculateFlags();
+		this.generateByteCode();
+		this.writeToFile(destination);
 
 	}
 
 	public void run(String source) {
 		this.loadAssembly(source);
 		this.extractCalculateFlags();
+		this.generateByteCode();
+		this.writeToFile(source.substring(0,source.length()-4)+".BC.txt");
 
 	}
 
 	private void generateByteCode() {
+
 		int arraySize = this.assemblyInput.size();
+		this.byteCodeArray = new String[arraySize];
+		
 		for (int index = 0; index < arraySize; index++) {
 			String assembleCode = this.assemblyInput.get(index);
 			this.scan = new Scanner(assembleCode);
 			ArrayList<String> argList = new ArrayList<String>();
 
-			for (int argNumber = 1; this.scan.hasNext(); argNumber++) { // puts
-																		// all
-																		// of
-																		// the
-																		// words
-																		// into
-																		// an
-																		// ArrayList
+			for (int argNumber = 1; this.scan.hasNext(); argNumber++) { 
 				argList.add(this.scan.next());
 			}
 
 			this.scan.close();
+			String[] argArray=argList.toArray(new String[2]);
+			String[] formatArray=this.byteMap.get(argArray[0]);
+
+				this.byteCodeArray[index]=formatArray[0];
+				
+			for(int subIndex=1;subIndex<argArray.length;subIndex++){
+				
+				String argI=argArray[subIndex];
+				String formatI=formatArray[subIndex];
+				
+				if(formatI.equals("x"))
+					this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(0,11);
+				
+				else if(formatI.equals("i")&&subIndex==1){
+					try{
+					this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(Integer.parseInt(argI),11);
+					} catch (Exception e){
+						this.byteCodeArray[index]+=AssemblerConverter.intToBooleanString_withLength(0,11);
+					}
+				}
+			
+				// Add more types here-----------------------------------------------------------------------------------
+			}
+			
+			
+			
 		}
 
 	}
 
+	private void writeToFile(String destination){
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(destination, "UTF-8");
+			for(int i=0;i<this.byteCodeArray.length;i++)
+				writer.println(this.byteCodeArray[i]);
+			writer.close();
+		} catch (Exception exception) {
+			System.err.println("Issue Writing");
+		}
+		
+
+	}
+	
 	private class Flag {
 		int line;
 		@SuppressWarnings("unused")
