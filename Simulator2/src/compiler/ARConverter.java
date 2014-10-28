@@ -4,7 +4,7 @@ package compiler;
  * 
  * @author larsonp. Created Oct 21, 2014.
  */
-public class AssemblerConverter {
+public class ARConverter {
 
 	/**
 	 * This converts from a string to an int. don't screw up.
