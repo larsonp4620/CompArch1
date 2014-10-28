@@ -1,0 +1,7 @@
+pop 1
+push 0
+label: sadd
+push 1023
+dup 0
+sand
+sbeq label
