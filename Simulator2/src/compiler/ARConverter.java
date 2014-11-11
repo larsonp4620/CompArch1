@@ -13,7 +13,7 @@ public class ARConverter {
 	 * @return
 	 */
 	public static int booleanString2Dec(String input) {
-		return Integer.parseInt(input);
+		return Integer.parseInt(input,2);
 	}
 
 	/**
@@ -49,7 +49,19 @@ public class ARConverter {
 			for (int j = 0; j < needed; j++) {
 				zeroes=zeroes+"0";
 			}
+		}else{
+			temp=temp.substring(0, 11);
 		}
 		return zeroes+temp;
+	}
+	
+	public static String booleanStringToHex(String input){
+		String s=Integer.toHexString(Integer.parseInt(input, 2));
+		String z="";
+		if(s.length()<4)
+			for(int i=0;i<4-s.length();i++)
+				z+="0";
+		return z+s;
+		
 	}
 }

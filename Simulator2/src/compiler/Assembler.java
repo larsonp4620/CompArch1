@@ -86,7 +86,8 @@ public class Assembler {
 					String rest = "";
 					while (lineScanner.hasNext())
 						rest = rest + lineScanner.next();
-					rawAssembly.add(rest);
+					if (rest.length() != 0)
+						rawAssembly.add(rest);
 					lineScanner.close();
 				} else if (line.length() != 0) {
 					rawAssembly.add(line);
@@ -131,7 +132,8 @@ public class Assembler {
 		this.loadAssembly(source);
 		this.extractCalculateFlags();
 		this.generateByteCode();
-		this.writeToFile(source.substring(0, source.length() - 4) + ".BC.txt");
+		this.writeToFile(source.substring(0, source.length() - 4) + ".Bin.txt");
+		this.hexWriteToFile(source.substring(0, source.length() - 4) + ".Hex.txt");
 
 	}
 
@@ -154,13 +156,15 @@ public class Assembler {
 			String[] argArray = argList.toArray(new String[2]);
 			String[] formatArray = this.byteMap.get(argArray[0]);
 
-			this.byteCodeArray[index] = getByteCodeLine(formatArray, argArray);
+			this.byteCodeArray[index] = getByteCodeLine(formatArray, argArray,
+					this.baseAddress + index);
 
 		}
 
 	}
 
-	private String getByteCodeLine(String[] formatArray, String[] argumentArray) {
+	private String getByteCodeLine(String[] formatArray,
+			String[] argumentArray, int instrAddress) {
 		try {
 			String lineOfByteCode = formatArray[0];
 
@@ -168,35 +172,72 @@ public class Assembler {
 				String argI = argumentArray[subIndex];
 				String formatI = formatArray[subIndex];
 
-				if (formatI.equals("x"))
-					lineOfByteCode += ARConverter
-							.intToBooleanString_withLength(0, 11);
-
-				else if (formatI.equals("i")
-						&& (argumentArray[0].equals("sbne")
-								|| argumentArray[0].equals("sbeq") || argumentArray[0]
-									.equals("j"))) {
+				if (formatI.equals("x")) {
+					try {
+						lineOfByteCode += ARConverter
+								.intToBooleanString_withLength(0, 11);
+					} catch (Exception e) {
+						System.err
+								.println("Not totall sure how you screwed this one up, but "
+										+ argumentArray[0] + " didn't work");
+					}
+				} else if (formatI.equals("i")
+						&& (argumentArray[0].equals("sbne") || argumentArray[0]
+								.equals("sbeq"))) {
+					try{
 					Flag f = null;
 					for (int i = 0; i < this.flagList.size(); i++)
 						if (this.flagList.get(i).name.equals(argI))
 							f = this.flagList.get(i);
 					if (f == null) {
-						System.err
-								.println("Error compiling. Check flags used for branches");
+						System.err.println("Could not find flag on: "
+								+ argumentArray[0] + " " + argumentArray[1]);
 						return "-17-17-17-17-17-17-17-17-17";
 					}
 					int address = f.address;
-					int extra = (int) (Math
-							.log((double) this.instructionInterval) / Math
-							.log(2.0));
+					int difference = address - instrAddress - 1; // to
+																	// compensate
+																	// for that
+																	// thing.
+																	// Because
+																	// automatic
+																	// incrementing.
 					String binaryaddress = ARConverter
-							.intToBooleanString_withLength(0, extra);
-					binaryaddress += ARConverter
-							.intToBooleanString_withLength(address, 11);
-					binaryaddress = binaryaddress.substring(0,
-							binaryaddress.length() - extra);
+							.intToBooleanString_withLength(difference, 11);
 					lineOfByteCode += binaryaddress;
+					}catch (Exception e){
+						System.err.println("Problem on "+argumentArray[0] + " " + argumentArray[1]);
+						return "-17-17-17-17-17-17-17";
+					}
 
+				} else if (formatI.equals("i")
+						&& (argumentArray[0].equals("j"))) {
+					if (argI == null) {
+						if (argumentArray[0].equals("pop"))
+								lineOfByteCode +=ARConverter
+										.intToBooleanString_withLength(1, 11);
+						else
+						lineOfByteCode += ARConverter
+								.intToBooleanString_withLength(0, 11);
+					} else {
+						Flag f = null;
+						for (int i = 0; i < this.flagList.size(); i++)
+							if (this.flagList.get(i).name.equals(argI))
+								f = this.flagList.get(i);
+						if (f == null) {
+							System.err
+									.println("Could not find flag on: "
+											+ argumentArray[0] + " "
+											+ argumentArray[1]);
+							return "-17-17-17-17-17-17-17-17-17";
+						}
+						lineOfByteCode += ARConverter
+								.intToBooleanString_withLength(0, 6);
+						lineOfByteCode += ARConverter
+								.intToBooleanString_withLength(f.address, 16)
+								.substring(0, 5);
+
+					}
 				} else if (formatI.equals("i") && subIndex == 1) {
 
 					try {
@@ -204,8 +245,32 @@ public class Assembler {
 								.intToBooleanString_withLength(
 										Integer.parseInt(argI), 11);
 					} catch (Exception e) {
-						lineOfByteCode += ARConverter
-								.intToBooleanString_withLength(0, 11);
+						try {
+							if (argI == null) {
+								lineOfByteCode += ARConverter
+										.intToBooleanString_withLength(0, 11);
+							} else {
+								Flag f = null;
+								for (int i = 0; i < this.flagList.size(); i++)
+									if (this.flagList.get(i).name.equals(argI))
+										f = this.flagList.get(i);
+								if (f == null) {
+									System.err
+											.println("Could not find flag on: "
+													+ argumentArray[0] + " "
+													+ argumentArray[1]);
+									return "-17-17-17-17-17-17-17-17-17";
+								}
+								lineOfByteCode += ARConverter
+										.intToBooleanString_withLength(
+												f.address, 11);
+							}
+						} catch (Exception j) {
+							System.err.println("Parse error on line: "
+									+ argumentArray[0]);
+							lineOfByteCode += ARConverter
+									.intToBooleanString_withLength(0, 11);
+						}
 					}
 				}
 
@@ -215,8 +280,8 @@ public class Assembler {
 			return lineOfByteCode;
 		} catch (Exception e) {
 			System.err
-					.println("Error compiling. Check flags used for branches");
-			return ("this line error'd");
+					.println("Error compiling line: "+argumentArray[0] + " " + argumentArray[1]);
+			return "There was some crap here";
 		}
 	}
 
@@ -233,6 +298,19 @@ public class Assembler {
 
 	}
 
+	private void hexWriteToFile(String destination){
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(destination, "UTF-8");
+			for (int i = 0; i < this.byteCodeArray.length; i++)
+				writer.println(ARConverter.booleanStringToHex(this.byteCodeArray[i])+",");
+			writer.close();
+		} catch (Exception exception) {
+			System.err.println("Issue Writing");
+		}
+
+	}
+	
 	private class Flag {
 		int line;
 		@SuppressWarnings("unused")

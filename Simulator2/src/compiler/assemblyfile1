@@ -1,7 +1,59 @@
-pop 1
-push 0
-label: sadd
-push 1023
+dup 1
+push 2
+loop:
+jal gcd
+push 1
+dup -1
+sbeq end
+push 1
+sadd
+push loop
+j
+end:
+pop
+pop
+dup -2
+ret
+gcd:
+dup 2
+push 1
+dup 3
+sbeq returnb
+pop
+dup 1
+dup  3
+loop2:
 dup 0
-sand
-sbeq label
+push 0
+sbeq returna
+dup 2
+dup 2
+sslt
+push 1
+sbeq	sub2
+sub1:
+dup 2
+push 0
+ssub
+sadd
+push postsub
+j
+sub2:
+dup 2
+dup 2
+push 0
+ssub
+sadd
+pop
+pop
+pop
+dup -3
+dup -1
+postsub:
+push loop2
+j
+returna:
+pop
+returnb:
+pop
+ret
