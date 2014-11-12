@@ -213,10 +213,6 @@ public class Assembler {
 				} else if (formatI.equals("i")
 						&& (argumentArray[0].equals("j"))) {
 					if (argI == null) {
-						if (argumentArray[0].equals("pop"))
-								lineOfByteCode +=ARConverter
-										.intToBooleanString_withLength(1, 11);
-						else
 						lineOfByteCode += ARConverter
 								.intToBooleanString_withLength(0, 11);
 					} else {
@@ -246,7 +242,11 @@ public class Assembler {
 										Integer.parseInt(argI), 11);
 					} catch (Exception e) {
 						try {
-							if (argI == null) {
+							if (argI == null) {						
+								if (argumentArray[0].equals("pop"))
+								lineOfByteCode +=ARConverter
+								.intToBooleanString_withLength(1, 11);
+								else
 								lineOfByteCode += ARConverter
 										.intToBooleanString_withLength(0, 11);
 							} else {
