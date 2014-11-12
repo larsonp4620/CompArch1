@@ -2,58 +2,186 @@ package compiler;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Compiler {
-	ArrayList<String> delimiters=new ArrayList<String>();
-	ArrayList<String> RawInput=new ArrayList<String>();
-	public Compiler(){
-		
+	ArrayList<String> delimiters = new ArrayList<String>();
+	ArrayList<String> rawInput = new ArrayList<String>();
+	node root;
+
+	public Compiler() {
+
 	}
-	
-	public void loadDefinitions(String source){
-		try{
+
+	private void loadDefinitions(String source) {
+		try {
 			File inputFile = new File(source);
 			Scanner fileScanner = new Scanner(inputFile);
-			String line=fileScanner.nextLine();
-			Scanner subScanner= new Scanner(line);
-			while(subScanner.hasNext())
-			delimiters.add(subScanner.next());
+			String line = fileScanner.nextLine();
+			Scanner subScanner = new Scanner(line);
+			while (subScanner.hasNext())
+				delimiters.add(subScanner.next());
 			subScanner.close();
-			while(fileScanner.hasNext()){
+			while (fileScanner.hasNext()) {
 				//
 			}
 			fileScanner.close();
-			
-		} catch (Exception e){
+
+		} catch (Exception e) {
 			System.err.println("There was a problem loading definitions");
 		}
 	}
-	
-	public void loadText(String source){
-		try{
+
+	private void loadText(String source) {
+		try {
 			File inputFile = new File(source);
 			Scanner fileScanner = new Scanner(inputFile);
-			String line="";
-			while(fileScanner.hasNext()){ // while there is a line that has not been scanned yet. 
-				line=fileScanner.nextLine();       //get line
-				ArrayList<String> lineArray=new ArrayList<String>(); 
-				lineArray.add(line);  
-				for(int i=0;i<this.delimiters.size();i++){
-					
-				}
+			String line = "";
+			while (fileScanner.hasNext()) { // while there is a line that has
+											// not been scanned yet.
+				this.rawInput.add(fileScanner.nextLine());
 			}
 			fileScanner.close();
-			
-		} catch (Exception e){
-			System.err.println("There was a problem loading code");
+
+		} catch (Exception e) {
+			System.err.println("Invalid file path.");
 		}
-		
+
 	}
-	
-	private String getNextToken(Scanner scan){
+
+	private void removeCommentsEmptyLinesTrim() {
+		int length = this.rawInput.size();
+		for (int i = 0; i < length; i++) {
+			String line = this.rawInput.get(i);
+			int indexSlash = line.indexOf("//");
+			if (indexSlash != -1) {
+				line = line.substring(0, indexSlash); // only can ignore
+														// comments like this
+				line = line.trim();
+				this.rawInput.set(i, line);
+			}
+			line = line.trim();
+			if (line.length() == 0) {
+				this.rawInput.remove(i);
+				i--;
+				length--;
+			} else{
+			this.rawInput.set(i, line);
+			}
+		}
+	}
+
+	public LinkedList<String> semicolonify() { // creates a new array with shallow semicolon
+									// delimination.
+		LinkedList<String> parsedInput = new LinkedList<String>();
+		LinkedList<String> rawLL = new LinkedList<String>();
+		rawLL.addAll(rawInput);
+		String line = "";
+		while (true) {
+			if (line.length() == 0) {
+				if (rawLL.isEmpty())
+					break;
+				line = rawLL.removeFirst();
+			}
+			int firstparenIndex = line.indexOf("(");
+			int firstBracketIndex = line.indexOf("{");
+			int secondBracketIndex = line.indexOf("}");
+			int secondparenIndex = line.indexOf(")");
+			int semicolonIndex = line.indexOf(";");
+
+			int index = 1000000; // Unrealistically large. If this bites me i'll
+									// cry
+			String id = ":D";
+			if (firstparenIndex != -1) {
+				index = firstparenIndex;
+				id = "(";
+			}
+			if ((firstBracketIndex != -1) && (firstBracketIndex < index)) {
+				index = firstBracketIndex;
+				id = "{";
+			}
+			if ((secondBracketIndex != -1) && (secondBracketIndex < index)) {
+				index = secondBracketIndex;
+				id = "}";
+			}
+			if ((secondparenIndex != -1) && (secondparenIndex < index)) {
+				index = secondparenIndex;
+				id = ")";
+			}
+			if ((semicolonIndex != -1) && (semicolonIndex < index)) {
+				index = semicolonIndex;
+				id = ";";
+			}
+			if (index != 1000000) {
+				if (id.equals("{")) {
+					String front = line.substring(0, index);
+					if (front.length() != 0) {
+						System.err.println("important?: " + front);
+					}
+					parsedInput.add("{");
+
+				} else if (id.equals("(")) {
+					parsedInput.add(line.substring(0, index + 1));
+
+				} else if (id.equals(")")) {
+					String last = parsedInput.removeLast();
+					last = last + line.substring(0, index + 1);
+					parsedInput.add(last);
+
+				} else if (id.equals("}")) {
+					parsedInput.add("}");
+					if (index != 0) {
+						System.err.println("important?: " + line.substring(0, index));
+					}
+
+				} else if (id.equals(";")) {
+					if(index==0){
+						String last=parsedInput.removeLast();
+						last=last+";";
+						parsedInput.add(last);
+					} else
+					parsedInput.add(line.substring(0, index + 1));
+				}
+				if (index + 1 == line.length())
+					line = "";
+				else
+					line = line.substring(index + 1);
+			}
+			else
+			System.out.println("What is this: "+line);
+		}
+		return parsedInput;
+	}
+
+	public void parser(String definitionsource, String codeSource) {
+		System.out.println("Parsing! Yay!");
+		loadDefinitions(definitionsource);
+		loadText(codeSource);
+		removeCommentsEmptyLinesTrim();
+
+	}
+
+	// public node generateTree(ArrayList<String> input) {
+	//
+	// }
+
+	private String getNextToken(Scanner scan) {
 
 		return "";
 	}
-	
+
+	private class node {
+		String type;
+		ArrayList<node> children = new ArrayList<node>();
+
+		private node(String type) {
+			this.type = type;
+		}
+
+		private node(String type, ArrayList<node> children) {
+			this.children = children;
+		}
+	}
 }
