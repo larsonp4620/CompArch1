@@ -1,59 +1,66 @@
-dup 1
+push 1
+push 1
+push 10
+pop 1
+pop -1
 push 2
 loop:
+pop -2
+dup 4
+dup 4
+pop 2
 jal gcd
 push 1
-dup -1
-sbeq end
+sbeq returnM
+pop 1
 push 1
 sadd
-push loop
+push loop:
 j
-end:
-pop
-pop
-dup -2
+returnM:
+pop 5
+dup -3
+pop -1
 ret
 gcd:
-dup 2
-push 1
-dup 3
-sbeq returnb
-pop
-dup 1
-dup  3
-loop2:
-dup 0
+pop -2
 push 0
-sbeq returna
+sbeq returnB
+loopGCD:
 dup 2
-dup 2
+push 0
+sbeq returnA
+pop 1
+dup 1
+dup 3
 sslt
 push 1
-sbeq	sub2
-sub1:
+sbeq subB
+pop 1
 dup 2
-push 0
+dup 2
 ssub
-sadd
-push postsub
+pop 3
+dup -2
+pop -1
+push postSub
 j
-sub2:
-dup 2
-dup 2
-push 0
-ssub
-sadd
-pop
-pop
-pop
-dup -3
+subB:
+pop 1
+dup 1
+dup 3
+pop 2
 dup -1
-postsub:
-push loop2
+postSub:
+push loopGCD
 j
-returna:
-pop
-returnb:
-pop
+returnB:
+pop 4
+dup -2
+pop -1
+ret
+returnA:
+pop 5
+dup -3
+pop -1
 ret

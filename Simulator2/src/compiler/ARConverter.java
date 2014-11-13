@@ -43,6 +43,11 @@ public class ARConverter {
 	 */
 	public static String intToBooleanString_withLength(int input, int length){
 		String zeroes = "";
+
+		if(input<0){
+			int max=(int) Math.pow(2,length-1);
+			input=input+2*max;
+		}		
 		String temp = Integer.toBinaryString(input);
 		if (temp.length() < length) {
 			int needed = length - temp.length();

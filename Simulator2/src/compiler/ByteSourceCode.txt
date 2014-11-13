@@ -14,3 +14,4 @@ sra 01100 i
 sll 01101 i
 ret 01110 x
 pushu 01111 i
+quit 11111 x

@@ -6,12 +6,12 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
-public class Compiler {
+public class CompilerAlpha {
 	ArrayList<String> delimiters = new ArrayList<String>();
 	ArrayList<String> rawInput = new ArrayList<String>();
-	node root;
+	SyntaxNode root;
 
-	public Compiler() {
+	public CompilerAlpha() {
 
 	}
 
@@ -163,25 +163,39 @@ public class Compiler {
 
 	}
 
-	// public node generateTree(ArrayList<String> input) {
-	//
-	// }
-
+	 public SyntaxNode generateFullTree(LinkedList<String> input) {
+		 ArrayList<SyntaxNode> functionList= new ArrayList<SyntaxNode>();
+		 
+		 SyntaxNode main=blockGeneration(input);//change
+		 
+		 return main;
+	 }
+	public SyntaxNode blockGeneration(LinkedList<String> input){
+		SyntaxNode block=new SyntaxNode("block");
+		
+		return block;
+	}
+//	private LinkedList<String> getFunction(String name){
+//		
+//	}
+	 
 	private String getNextToken(Scanner scan) {
 
 		return "";
 	}
 
-	private class node {
+	private class SyntaxNode {
 		String type;
-		ArrayList<node> children = new ArrayList<node>();
-
-		private node(String type) {
+		String returnType;
+		String name;
+		ArrayList<SyntaxNode> arguments = new ArrayList<SyntaxNode>();
+		ArrayList<SyntaxNode> nested = new ArrayList<SyntaxNode>();
+		private SyntaxNode(String type) {
 			this.type = type;
 		}
 
-		private node(String type, ArrayList<node> children) {
-			this.children = children;
+		private SyntaxNode(String type, ArrayList<SyntaxNode> arguments) {
+			this.arguments = arguments;
 		}
 	}
 }

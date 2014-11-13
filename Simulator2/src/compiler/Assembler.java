@@ -140,7 +140,7 @@ public class Assembler {
 	private void generateByteCode() {
 
 		int arraySize = this.assemblyInput.size();
-		this.byteCodeArray = new String[arraySize];
+		this.byteCodeArray = new String[arraySize+1];
 
 		for (int index = 0; index < arraySize; index++) {
 			String assembleCode = this.assemblyInput.get(index);
@@ -160,6 +160,7 @@ public class Assembler {
 					this.baseAddress + index);
 
 		}
+		this.byteCodeArray[arraySize]="1111111111111111";
 
 	}
 
@@ -183,7 +184,8 @@ public class Assembler {
 					}
 				} else if (formatI.equals("i")
 						&& (argumentArray[0].equals("sbne") || argumentArray[0]
-								.equals("sbeq"))) {
+								.equals("sbeq")|| argumentArray[0]
+										.equals("jal"))) {
 					try{
 					Flag f = null;
 					for (int i = 0; i < this.flagList.size(); i++)
