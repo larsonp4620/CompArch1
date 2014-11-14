@@ -1,66 +1,67 @@
 push 1
 push 1
-push 10
+push 994
+pushu 128
 pop 1
 pop -1
 push 2
 loop:
 pop -2
+dup 2
 dup 4
-dup 4
-pop 2
+pop 3
 jal gcd
 push 1
 sbeq returnM
 pop 1
 push 1
 sadd
-push loop:
+push loop
 j
 returnM:
-pop 5
-dup -3
-pop -1
-ret
+pop 1
+sslt
+quit
 gcd:
 pop -2
 push 0
 sbeq returnB
 loopGCD:
-dup 2
+dup 1
 push 0
 sbeq returnA
 pop 1
-dup 1
-dup 3
+dup 0
+dup 2	
 sslt
-push 1
+push 0
 sbeq subB
 pop 1
-dup 2
-dup 2
+dup 1	
+dup 1	
 ssub
-pop 3
+pop 2	
 dup -2
-pop -1
 push postSub
 j
 subB:
-pop 1
-dup 1
-dup 3
-pop 2
-dup -1
+pop 1			
+dup 0	
+dup 2	
+ssub
+pop 3
+dup -3
+pop -1
 postSub:
 push loopGCD
 j
 returnB:
-pop 4
-dup -2
+pop 5
+dup -3
 pop -1
 ret
 returnA:
 pop 5
-dup -3
+dup -4
 pop -1
 ret

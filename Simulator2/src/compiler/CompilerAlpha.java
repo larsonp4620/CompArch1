@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CompilerAlpha {
 	ArrayList<String> delimiters = new ArrayList<String>();
@@ -163,7 +165,7 @@ public class CompilerAlpha {
 
 	}
 
-	 public SyntaxNode generateFullTree(LinkedList<String> input) {
+	public SyntaxNode generateFullTree(LinkedList<String> input) {
 		 ArrayList<SyntaxNode> functionList= new ArrayList<SyntaxNode>();
 		 
 		 SyntaxNode main=blockGeneration(input);//change
@@ -175,9 +177,15 @@ public class CompilerAlpha {
 		
 		return block;
 	}
-//	private LinkedList<String> getFunction(String name){
-//		
-//	}
+	private ArrayList<SyntaxNode> getFunction(String name,LinkedList<String> sCInput){
+		ArrayList<SyntaxNode> nodeList =new ArrayList<SyntaxNode>();
+		Pattern functionPattern =Pattern.compile("\\w+\\s(\\w+\\(.*\\){1,})");
+		for(int i=0;i<sCInput.size();i++){
+			Matcher functionMatcher = functionPattern.matcher(sCInput.get(i));
+			
+		}
+		return null;
+	}
 	 
 	private String getNextToken(Scanner scan) {
 

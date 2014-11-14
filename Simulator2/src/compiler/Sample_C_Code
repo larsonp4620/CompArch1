@@ -22,8 +22,7 @@ int main() //this is a comment
    else()
       printf("%d is not a palindrome number.\n", n);
  
-   return 0;
-}
+   return 0; }
 
  int second(int i){
  i=i^2;
