@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 public class CompilerAlpha {
 	ArrayList<String> delimiters = new ArrayList<String>();
 	ArrayList<String> rawInput = new ArrayList<String>();
+	LinkedList<String> semiCified;
+	ArrayList<SyntaxNode> functionList;
 	SyntaxNode root;
 
 	public CompilerAlpha() {
@@ -157,34 +159,75 @@ public class CompilerAlpha {
 		return parsedInput;
 	}
 
-	public void parser(String definitionsource, String codeSource) {
-		System.out.println("Parsing! Yay!");
+	public void lexer(String definitionsource, String codeSource) {
+		System.out.println("lexing? Yay!");
 		loadDefinitions(definitionsource);
 		loadText(codeSource);
 		removeCommentsEmptyLinesTrim();
+		this.semiCified=semicolonify();
+		functionList=getFunctionNodes(semiCified);
+		
+		
 
 	}
 
 	public SyntaxNode generateFullTree(LinkedList<String> input) {
 		 ArrayList<SyntaxNode> functionList= new ArrayList<SyntaxNode>();
 		 
-		 SyntaxNode main=blockGeneration(input);//change
+		 SyntaxNode main=nodeGenerator(input);//change
 		 
 		 return main;
 	 }
-	public SyntaxNode blockGeneration(LinkedList<String> input){
+
+	public SyntaxNode nodeGenerator(LinkedList<String> input){
 		SyntaxNode block=new SyntaxNode("block");
 		
 		return block;
 	}
-	private ArrayList<SyntaxNode> getFunction(String name,LinkedList<String> sCInput){
+
+	private ArrayList<SyntaxNode> getFunctionNodes(LinkedList<String> sCInput){
 		ArrayList<SyntaxNode> nodeList =new ArrayList<SyntaxNode>();
 		Pattern functionPattern =Pattern.compile("\\w+\\s(\\w+\\(.*\\){1,})");
+		Pattern wordpattern =Pattern.compile("\\w+");
+		boolean inFunctionDefinition=false;
+		int bracketDepth=0;
+		LinkedList<String> codeBody = null;
+		Matcher nameMatcher = null;
 		for(int i=0;i<sCInput.size();i++){
 			Matcher functionMatcher = functionPattern.matcher(sCInput.get(i));
+
+			if(inFunctionDefinition){
+				if(sCInput.get(i).equals("}"))
+					bracketDepth--;
+				if(sCInput.get(i).equals("{"))
+					bracketDepth++;
+				if(bracketDepth==0){
+					nameMatcher.find();
+					nameMatcher.find();
+					inFunctionDefinition=false;
+					SyntaxNode function =nodeGenerator(codeBody);
+					function.name=nameMatcher.group();
+					function.type="function";
+					nodeList.add(function);
+					
+				}else{
+					codeBody.add(sCInput.get(i));
+				}
+					
+					
+			}
+			if(functionMatcher.find()){
+				if(i+1<sCInput.size()&&sCInput.get(i+1).equals("{")){
+					nameMatcher =wordpattern.matcher(sCInput.get(i));
+					inFunctionDefinition=true;
+					i++;
+					bracketDepth++;;
+					codeBody=new LinkedList<String>();
+				}
+			}
 			
 		}
-		return null;
+		return nodeList;
 	}
 	 
 	private String getNextToken(Scanner scan) {

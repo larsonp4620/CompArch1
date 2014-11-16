@@ -19,10 +19,12 @@ int main() //this is a comment
  	n=second(2);
    if ( n == reverse ) {
       printf("%d is a palindrome number.\n", n);
+      }
    else()
       printf("%d is not a palindrome number.\n", n);
  
-   return 0; }
+   return 0; 
+   }
 
  int second(int i){
  i=i^2;
